@@ -1,0 +1,30 @@
+# Freelance Hunter — Planning Pack v0.1
+
+**Status:** Implementation-ready planning baseline · **Date:** 2026-10-20 · **Language:** English for coding agents; product decisions agreed in Turkish.
+
+## Mission
+Build a single-user, low-cost **Freelance + Remote Contract Market Intelligence** service. Collect permitted listings, normalize and deduplicate them, classify engagement types, extract technical skills, persist history, and deliver Telegram reports. Later add personalized ML ranking and human-approved proposals.
+
+## Start here (agent reading order)
+1. `AGENTS.md` — operating contract and guardrails.
+2. `docs/PRD.md` — scope, requirements and acceptance criteria.
+3. `docs/ARCHITECTURE.md` — runtime and data flow.
+4. `docs/TECH_SPEC.md` — interfaces, processing rules, reliability.
+5. `docs/DATA_MODEL.md` and `schemas/schema.sql` — database contract.
+6. `docs/SOURCE_POLICY.md` — mandatory pre-connector source review.
+7. `docs/ROADMAP.md` and `backlog/BACKLOG.md` — sequence and priorities.
+8. `backlog/SPRINT_01.md` — first implementation sprint.
+
+## Non-negotiable decisions
+- **Scope:** freelance project, freelance hourly and remote contract listings; label each separately. Exclude employee full-time and internships; retain uncertain classifications separately.
+- **Hosting:** existing Railway Hobby plan, target total included usage <= $5/month (not a guarantee). One service and one instance for MVP.
+- **Runtime:** Python 3.12, FastAPI, httpx, SQLAlchemy 2, Alembic, SQLite on persistent Railway volume, APScheduler, Telegram Bot HTTP API.
+- **No LLM or browser agent in MVP.** Playwright is an optional later adapter only where explicitly permitted.
+- **Source permission first:** do not collect/store data from a source until its terms, rate limits and storage conditions have been verified and documented.
+- **No autonomous applications or outreach.** Later submissions require explicit human approval and platform authorization.
+
+## Repository workflow
+This pack is documentation-only. Copy its files into a new `freelance-hunter` repository. Implement Sprint 1 first. Never treat example source names as approved sources.
+
+## MVP definition of done
+Two **verified-permitted** sources, persistent normalized listings, engagement classification, deduplication, basic skill statistics, Telegram commands and daily report, collection health, restart recovery, tests and measured Railway usage. If two sources cannot be legally integrated, report blocker instead of violating policies.
