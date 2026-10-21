@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from sqlalchemy import and_, delete, or_, select
 from sqlalchemy.orm import Session
 
+from app.analytics.skills import persist_job_skills
 from app.db.models import Job, JobSnapshot, Source
 from app.normalization.jobs import NormalizedJob, normalize_job, retention_cutoff
 from app.sources.base import RawJob
@@ -76,7 +77,10 @@ def ingest_raw_jobs(
     for raw_job in raw_jobs:
         try:
             normalized = normalize_job(raw_job, source.description_storage_allowed)
-            _, created, changed = upsert_job(session, source, normalized, now)
+            job, created, changed = upsert_job(session, source, normalized, now)
+            persist_job_skills(
+                session, job.id, f"{normalized.title}\n{normalized.description or ''}"
+            )
             created_count += int(created)
             updated_count += int(changed and not created)
         except (ValueError, TypeError):

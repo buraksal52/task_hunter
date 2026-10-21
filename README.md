@@ -1,6 +1,6 @@
 # Freelance Hunter — Planning Pack v0.1
 
-**Status:** Sprint 1 foundation implemented · **Date:** 2026-10-21 · **Language:** English for coding agents; product decisions agreed in Turkish.
+**Status:** Sprint 1–3 implementation in progress · **Date:** 2026-10-21 · **Language:** English for coding agents; product decisions agreed in Turkish.
 
 ## Mission
 Build a single-user, low-cost **Freelance + Remote Contract Market Intelligence** service. Collect permitted listings, normalize and deduplicate them, classify engagement types, extract technical skills, persist history, and deliver Telegram reports. Later add personalized ML ranking and human-approved proposals.
@@ -37,7 +37,7 @@ uv run alembic upgrade head
 uv run uvicorn app.main:app --reload
 ```
 
-Run checks with `uv run ruff check .` and `uv run pytest`. The default configuration keeps collection disabled and has no approved sources. `/hunt` reports that no approved sources are enabled; it does not claim a scan occurred.
+Run checks with `uv run ruff check .` and `uv run pytest`. The default configuration keeps collection disabled and has no approved sources. `/hunt` reports that no approved sources are enabled; it does not claim a scan occurred. Analytics reports use UTC first-seen windows, exclude onsite-only jobs from eligible rankings, and show unknown classifications separately. Authenticated `/api/v1/sources` reports last success, freshness and latest run errors.
 
 ## Deployment baseline
 

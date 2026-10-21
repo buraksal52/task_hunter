@@ -29,3 +29,6 @@
 
 ## ADR-008 — Sprint 2 source policy gate
 **Accepted.** On 2026-10-21, Remote OK, Remotive, Freelancer.com, Jobicy and Himalayas were reviewed against official materials. Jobicy and Himalayas pass a bounded policy gate with attribution and source-specific retention rules; their adapter classes are enabled, but database source rows remain disabled by default until an operator explicitly enables them. Remote OK and Remotive lack sufficient retention/polling/storage clarity, while Freelancer.com has explicit restrictions that conflict with this aggregator-style use case.
+
+## ADR-009 — Sprint 3 analytics scope
+**Accepted.** Analytics uses UTC first-seen windows. Eligible counts and skill rankings include freelance project/hourly and remote contract jobs, exclude onsite-only jobs, and keep unknown classifications visible but out of eligible rankings. Reports explicitly describe the result as an approved-source sample.

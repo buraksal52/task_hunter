@@ -38,3 +38,20 @@ def test_hunt_is_honest_when_no_sources_approved(client):
     with client.app.state.session_factory() as session:
         assert session.get(TelegramUpdate, 1) is not None
         assert session.query(CollectionTask).count() == 0
+
+
+def test_stats_returns_real_scoped_report(client):
+    response = client.post(
+        "/telegram/webhook",
+        headers={"X-Telegram-Bot-Api-Secret-Token": "test-secret"},
+        json={
+            "update_id": 100,
+            "message": {
+                "text": "/stats",
+                "from": {"id": 7},
+                "chat": {"id": 8},
+            },
+        },
+    )
+    assert response.status_code == 200
+    assert "market report" in response.json()["message"]

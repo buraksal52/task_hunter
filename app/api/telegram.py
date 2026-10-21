@@ -1,12 +1,14 @@
 import secrets
-from datetime import UTC
+from datetime import UTC, date
 
 from fastapi import APIRouter, Header, HTTPException, Request, status
 from sqlalchemy import select
 
+from app.analytics.queries import market_stats
 from app.collection.queue import enqueue_task
 from app.core.config import Settings
 from app.db.models import Source, TelegramUpdate
+from app.notifications.reports import format_daily_report
 
 
 def build_router(settings: Settings, session_factory) -> APIRouter:
@@ -67,9 +69,13 @@ def build_router(settings: Settings, session_factory) -> APIRouter:
                 response["message"] = (
                     "Freelance Hunter is ready. Use /hunt to scan approved sources."
                 )
-            elif command in {"/health", "/stats", "/sources"}:
+            elif command == "/stats":
+                response["message"] = format_daily_report(
+                    market_stats(session, date.today(), date.today())
+                )
+            elif command in {"/health", "/sources"}:
                 response["message"] = (
-                    "Command accepted; reporting is available after foundation setup."
+                    "Command accepted; source health is available through the authenticated API."
                 )
             session.commit()
         return response
