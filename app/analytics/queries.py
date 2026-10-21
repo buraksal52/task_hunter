@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, date, datetime, time, timedelta
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 
 from app.db.models import Job, JobSkill, Skill, Source
 
@@ -70,6 +70,51 @@ def market_stats(session: Session, start: date, end: date) -> dict:
         .limit(20)
     ).all()
 
+    budget_rows = session.execute(
+        select(
+            Job.currency,
+            Job.budget_type,
+            func.count(Job.id),
+            func.count(Job.budget_min),
+            func.min(Job.budget_min),
+            func.max(Job.budget_max),
+        )
+        .where(
+            *window,
+            Job.engagement_type.in_(ELIGIBLE_ENGAGEMENT_TYPES),
+            Job.remote_policy != "onsite",
+            Job.currency.is_not(None),
+            Job.budget_type != "unknown",
+        )
+        .group_by(Job.currency, Job.budget_type)
+        .order_by(Job.currency, Job.budget_type)
+    ).all()
+
+    left_skill = aliased(JobSkill)
+    right_skill = aliased(JobSkill)
+    left_name = aliased(Skill)
+    right_name = aliased(Skill)
+    pair_rows = session.execute(
+        select(
+            left_name.canonical_name,
+            right_name.canonical_name,
+            func.count(Job.id),
+        )
+        .join(left_skill, left_skill.skill_id == left_name.id)
+        .join(right_skill, right_skill.job_id == left_skill.job_id)
+        .join(Job, Job.id == left_skill.job_id)
+        .join(right_name, right_name.id == right_skill.skill_id)
+        .where(
+            *window,
+            left_skill.skill_id < right_skill.skill_id,
+            Job.engagement_type.in_(ELIGIBLE_ENGAGEMENT_TYPES),
+            Job.remote_policy != "onsite",
+        )
+        .group_by(left_skill.skill_id, right_skill.skill_id)
+        .order_by(func.count(Job.id).desc(), left_name.canonical_name, right_name.canonical_name)
+        .limit(20)
+    ).all()
+
     return {
         "period": {"start": start.isoformat(), "end": end.isoformat(), "timezone": "UTC"},
         "sample": {
@@ -79,6 +124,33 @@ def market_stats(session: Session, start: date, end: date) -> dict:
         },
         "by_source": by_source,
         "top_skills": [{"skill": name, "count": int(count)} for name, count in skill_rows],
+        "budget": {
+            "groups": [
+                {
+                    "currency": currency,
+                    "budget_type": budget_type,
+                    "job_count": int(job_count),
+                    "jobs_with_min": int(with_min),
+                    "observed_min": float(observed_min) if observed_min is not None else None,
+                    "observed_max": float(observed_max) if observed_max is not None else None,
+                }
+                for (
+                    currency,
+                    budget_type,
+                    job_count,
+                    with_min,
+                    observed_min,
+                    observed_max,
+                ) in budget_rows
+            ],
+            "caveat": (
+                "Currencies and budget types are never combined; missing values remain absent."
+            ),
+        },
+        "skill_cooccurrence": [
+            {"skills": sorted((left_name, right_name)), "count": int(count)}
+            for left_name, right_name, count in pair_rows
+        ],
         "scope": {
             "included_engagement": list(ELIGIBLE_ENGAGEMENT_TYPES),
             "excluded_remote_policy": ["onsite"],

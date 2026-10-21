@@ -1,8 +1,10 @@
 from datetime import UTC, date, datetime, timedelta
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy import select
 
+from app.analytics.export import export_jobs, jobs_to_csv
 from app.analytics.queries import market_stats
 from app.api.auth import admin_header, require_admin
 from app.collection.queue import enqueue_task
@@ -65,6 +67,30 @@ def build_router(settings: Settings, session_factory) -> APIRouter:
                     }
                 )
             return result
+
+    @router.get("/jobs/export")
+    def export(
+        start: date | None = None,
+        end: date | None = None,
+        output: str = "json",
+        api_key: str | None = Depends(admin_header),
+    ):
+        require_admin(settings, api_key)
+        end = end or date.today()
+        start = start or end
+        if output not in {"json", "csv"}:
+            return Response(status_code=400, content="output must be json or csv")
+        with session_factory() as session:
+            records = export_jobs(session, start, end)
+        if output == "csv":
+            return Response(
+                content=jobs_to_csv(records),
+                media_type="text/csv",
+                headers={"Content-Disposition": "attachment; filename=jobs.csv"},
+            )
+        return JSONResponse(
+            {"period": {"start": start.isoformat(), "end": end.isoformat()}, "jobs": records}
+        )
 
     @router.post("/collection-runs", status_code=202)
     def collection_runs(api_key: str | None = Depends(admin_header)):

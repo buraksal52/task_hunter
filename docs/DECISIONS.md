@@ -32,3 +32,9 @@
 
 ## ADR-009 — Sprint 3 analytics scope
 **Accepted.** Analytics uses UTC first-seen windows. Eligible counts and skill rankings include freelance project/hourly and remote contract jobs, exclude onsite-only jobs, and keep unknown classifications visible but out of eligible rankings. Reports explicitly describe the result as an approved-source sample.
+
+## ADR-010 — Budget analytics caveats
+**Accepted.** Budget aggregates never combine currencies or budget types. Missing budget fields remain absent, and skill co-occurrence counts only consider eligible jobs in the selected UTC first-seen window.
+
+## ADR-011 — Rights-aware exports
+**Accepted.** Export endpoints expose normalized fields only, require admin authentication, omit descriptions when the source policy disallows description storage, and reapply source expiry/retention filters at export time. CSV uses an empty description cell for restricted sources rather than leaking stored content.

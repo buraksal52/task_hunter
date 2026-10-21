@@ -66,6 +66,8 @@ Use `PRAGMA journal_mode=WAL`, `busy_timeout=5000`, `foreign_keys=ON`. Short wri
 ## Retry and idempotency
 Source request retries only for transient network/429/5xx with rate-limit-aware delay and jitter; cap attempts. Unique task idempotency key per source/scheduled window; no concurrent same-source fetch. Unique notification event keys. `sent_at` means Telegram API acknowledged request, not that user read message.
 
+Exports are admin-authenticated and normalized-field-only. Description fields are omitted or blank when source policy disallows storage, and expiry/retention filters are rechecked at export time.
+
 Immediate alerts are disabled by default. When explicitly enabled, only newly created eligible jobs (freelance project/hourly or remote contract, excluding onsite) enqueue a deduplicated Telegram outbox event keyed by source and external ID.
 
 ## Observability
