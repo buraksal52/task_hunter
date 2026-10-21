@@ -45,7 +45,9 @@ Non-API source material can use the authenticated `POST /api/v1/imports/manual` 
 
 ## Deployment baseline
 
-Deploy one container/replica on Railway with a persistent volume mounted at `/data`, `DATABASE_URL=sqlite:////data/hunter.db`, and the health check `/health/live`. Set secrets only as Railway variables. Telegram webhook registration and delivery require verified production secrets; neither is claimed by local tests.
+Deploy one container/replica on Railway using `railway.toml`. Create a persistent volume mounted at `/data`, set `DATABASE_URL=sqlite:////data/hunter.db`, and use `/health/live` as the health check. Set secrets only as Railway variables. Telegram webhook registration and delivery require verified production secrets; neither is claimed by local tests. Railway supplies the runtime `PORT`; the Docker start command uses it and falls back to `8000` locally.
+
+See [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md) for the exact Railway variables, volume setup and safe activation order.
 
 ## MVP definition of done
 Two **verified-permitted** sources, persistent normalized listings, engagement classification, deduplication, basic skill statistics, Telegram commands and daily report, collection health, restart recovery, tests and measured Railway usage. If two sources cannot be legally integrated, report blocker instead of violating policies.

@@ -12,7 +12,7 @@ Railway variables: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_AL
 6. Respond quickly; queue long-running collection tasks.
 
 ## Railway
-Single service/replica, one Uvicorn worker, persistent volume `/data`, `DATABASE_URL=sqlite:////data/hunter.db`. Check runtime filesystem ownership, DB WAL file placement and migrations. Set usage alert and a budget hard limit only after accounting for other Railway workloads; hard limit may suspend service. Monitor real usage before choosing polling frequency.
+Use the repository `railway.toml` configuration: root `Dockerfile`, `/health/live` healthcheck, one replica and restart-on-failure. Create one persistent Railway Volume and mount it at `/data`; set `DATABASE_URL=sqlite:////data/hunter.db`. Check runtime filesystem ownership, DB WAL file placement and migrations. Set usage alert and a budget hard limit only after accounting for other Railway workloads; hard limit may suspend service. Monitor real usage before choosing polling frequency.
 
 ## Backups and recovery
 Use `app.db.backup.backup_sqlite` for a consistent SQLite online backup, store backups outside the same volume when feasible, and verify with `verify_sqlite_backup`. Test restore at least once. On restart recover expired task leases, pending outbox messages and stale `sending` notifications. Document retention rules before ingesting source content.
