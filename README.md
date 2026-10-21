@@ -39,6 +39,8 @@ uv run uvicorn app.main:app --reload
 
 Run checks with `uv run ruff check .` and `uv run pytest`. The default configuration keeps collection and immediate alerts disabled and has no approved sources. `/hunt` reports that no approved sources are enabled; it does not claim a scan occurred. Analytics reports use UTC first-seen windows, exclude onsite-only jobs from eligible rankings, show unknown classifications separately, and keep budget currencies/types separate. Authenticated `/api/v1/sources` reports last success, freshness and latest run errors. `/api/v1/jobs/export` provides authenticated rights-aware JSON/CSV exports. Set `INSTANT_ALERTS_ENABLED=true` only when Telegram allowlist configuration is ready.
 
+For a consistent live SQLite backup, call `app.db.backup.backup_sqlite` and verify the artifact with `verify_sqlite_backup`; keep backups outside the application volume when possible.
+
 ## Deployment baseline
 
 Deploy one container/replica on Railway with a persistent volume mounted at `/data`, `DATABASE_URL=sqlite:////data/hunter.db`, and the health check `/health/live`. Set secrets only as Railway variables. Telegram webhook registration and delivery require verified production secrets; neither is claimed by local tests.
