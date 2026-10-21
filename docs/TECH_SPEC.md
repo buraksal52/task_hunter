@@ -36,6 +36,8 @@ Each adapter also exposes policy metadata: `allowed_method`, `minimum_poll_secon
 6. Add snapshot only when allowed and content hash changes. Extract skills with versioned dictionary and evidence; don't infer unmentioned skills.
 7. Write counts/error codes and complete task; enqueue report events where appropriate.
 
+The current collection engine implements this boundary with Jobicy and Himalayas adapters, UTC-aware `expires_at`, source-specific retention cleanup, idempotent content-hash snapshots, and a single APScheduler tick with `max_instances=1`. Runtime collection stays disabled unless both `COLLECTION_ENABLED=true` and a source row has `enabled=true` and `policy_status=approved`.
+
 ## Classification
 Deterministic ordered rules + explicit source metadata. Do not classify based solely on keyword `remote` or `contract` without context. Priority: explicit source type > structured employment field > carefully tested text patterns; contradictory evidence => `unknown`. Store `classification_confidence` and `classification_evidence`.
 

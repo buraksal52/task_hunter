@@ -8,8 +8,8 @@
 | Remote OK | Public feed/API candidate | Permitted polling, attribution, redistribution/storage? | BLOCKED / disabled |
 | Remotive | Public API/RSS candidate | Poll frequency, delayed publishing, storage and display restrictions? | BLOCKED / disabled |
 | Freelancer.com | Official developer API candidate | Account/API approval, rate limits, permitted listing access? | BLOCKED / disabled |
-| Jobicy | Official API/RSS documentation | Attribution, own-app use, polling and cache rules? | APPROVED / disabled until adapter |
-| Himalayas | Official API/RSS documentation | Own-app display, attribution, expiry and request rules? | APPROVED / disabled until adapter |
+| Jobicy | Official API/RSS documentation | Attribution, own-app use, polling and cache rules? | APPROVED / Source.enabled=false by default |
+| Himalayas | Official API/RSS documentation | Own-app display, attribution, expiry and request rules? | APPROVED / Source.enabled=false by default |
 | Other RSS feeds | RSS candidate | Feed usage rights, polling, description retention? | UNVERIFIED / disabled |
 
 ## Approval checklist (per source)

@@ -33,5 +33,7 @@ Webhook acknowledges only after queue record commits. Worker leases tasks atomic
 ## Scheduling
 Source-specific polling; intervals must comply with verified terms. Never assume source publication latency equals poll frequency. Store `published_at`, `first_seen_at`, `notified_at` separately. Daily report time configured with IANA timezone `Europe/Istanbul`; persist all timestamps UTC.
 
+Sprint 2 uses one APScheduler tick with `max_instances=1`. The tick enqueues only approved/enabled sources whose `minimum_poll_seconds` has elapsed, then processes at most one leased task. HTTP/network transient failures use capped exponential backoff and honor numeric `Retry-After`; permanent errors are not retried.
+
 ## Growth path
 v0.2 add detailed analytics and new-job alerts; v0.3 optional embeddings/ranking in isolated short-lived worker; v0.4 human-approved proposals; v0.5 authorized submission adapters. Extract separate compute worker only after actual resource measurements.

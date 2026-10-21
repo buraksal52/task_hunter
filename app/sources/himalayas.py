@@ -14,7 +14,7 @@ class HimalayasAdapter:
     retention_days = None
     attribution_required = True
     verified_at = "2026-10-21"
-    enabled = False
+    enabled = True
 
     def __init__(
         self,
@@ -49,6 +49,8 @@ class HimalayasAdapter:
             return None
         guid = str(item["guid"]).lstrip("/")
         url = guid if guid.startswith("http") else f"https://himalayas.app/jobs/{guid}"
+        period = str(item.get("salaryPeriod") or "").lower()
+        budget_type = "hourly" if "hour" in period else "fixed" if period else "unknown"
         return RawJob(
             source_key="himalayas",
             external_id=str(item["guid"]),
@@ -57,6 +59,12 @@ class HimalayasAdapter:
             description=item.get("description") or item.get("excerpt"),
             published_at=published_at,
             expires_at=expires_at,
+            budget_type=budget_type,
+            budget_min=item.get("minSalary"),
+            budget_max=item.get("maxSalary"),
+            currency=item.get("currency"),
+            engagement_hint=item.get("employmentType"),
+            remote_policy_hint="remote",
         )
 
 

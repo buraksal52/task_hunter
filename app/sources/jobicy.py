@@ -14,7 +14,7 @@ class JobicyAdapter:
     retention_days = 7
     attribution_required = True
     verified_at = "2026-10-21"
-    enabled = False
+    enabled = True
 
     def __init__(
         self, client: httpx.AsyncClient | None = None, base_url: str = "https://jobicy.com"
@@ -52,6 +52,11 @@ class JobicyAdapter:
             parsed_published_at = parsed_published_at.replace(tzinfo=UTC)
         if since and parsed_published_at and parsed_published_at <= since:
             return None
+        period = str(item.get("salaryPeriod") or "").lower()
+        budget_type = "hourly" if "hour" in period else "fixed" if period else "unknown"
+        job_types = item.get("jobType") or []
+        if isinstance(job_types, str):
+            job_types = [job_types]
         return RawJob(
             source_key="jobicy",
             external_id=str(item["id"]),
@@ -59,4 +64,10 @@ class JobicyAdapter:
             title=item["jobTitle"].strip(),
             description=item.get("jobDescription") or item.get("jobExcerpt"),
             published_at=parsed_published_at,
+            budget_type=budget_type,
+            budget_min=item.get("salaryMin"),
+            budget_max=item.get("salaryMax"),
+            currency=item.get("salaryCurrency"),
+            engagement_hint=" ".join(job_types) if job_types else None,
+            remote_policy_hint="remote",
         )

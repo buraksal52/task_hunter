@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.admin import build_router as build_admin_router
 from app.api.telegram import build_router as build_telegram_router
+from app.collection.scheduler import configure_scheduler
 from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
 from app.db.session import create_session_factory, init_db
@@ -22,7 +23,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         init_db(engine)
+        scheduler = configure_scheduler(session_factory) if settings.collection_enabled else None
+        if scheduler:
+            scheduler.start()
+        app.state.scheduler = scheduler
         yield
+        if scheduler:
+            scheduler.shutdown(wait=False)
         engine.dispose()
 
     app = FastAPI(title="Freelance Hunter", version="0.1.0", lifespan=lifespan)

@@ -1,9 +1,10 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+from app.db.types import UTCDateTime
 
 
 def utc_now() -> datetime:
@@ -19,13 +20,13 @@ class Source(Base):
     policy_status: Mapped[str] = mapped_column(String(20), default="unverified")
     access_method: Mapped[str | None] = mapped_column(String(50))
     terms_url: Mapped[str | None] = mapped_column(String(500))
-    policy_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    policy_verified_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     minimum_poll_seconds: Mapped[int | None] = mapped_column(Integer)
     retention_days: Mapped[int | None] = mapped_column(Integer)
     description_storage_allowed: Mapped[bool] = mapped_column(Boolean, default=False)
     attribution_required: Mapped[bool] = mapped_column(Boolean, default=False)
-    last_success_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    last_success_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
 
 
 class CollectionTask(Base):
@@ -36,12 +37,12 @@ class CollectionTask(Base):
     run_id: Mapped[int | None] = mapped_column(ForeignKey("collection_runs.id"))
     idempotency_key: Mapped[str] = mapped_column(String(255))
     status: Mapped[str] = mapped_column(String(20), default="queued")
-    scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    scheduled_at: Mapped[datetime] = mapped_column(UTCDateTime())
     lease_owner: Mapped[str | None] = mapped_column(String(100))
-    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    lease_until: Mapped[datetime | None] = mapped_column(UTCDateTime())
     attempts: Mapped[int] = mapped_column(Integer, default=0)
     max_attempts: Mapped[int] = mapped_column(Integer, default=3)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
 
 
 class CollectionRun(Base):
@@ -49,8 +50,8 @@ class CollectionRun(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     source_id: Mapped[int] = mapped_column(ForeignKey("sources.id"))
     status: Mapped[str] = mapped_column(String(20))
-    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    started_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     fetched_count: Mapped[int] = mapped_column(default=0)
     new_count: Mapped[int] = mapped_column(default=0)
     updated_count: Mapped[int] = mapped_column(default=0)
@@ -76,11 +77,12 @@ class Job(Base):
     budget_min: Mapped[float | None] = mapped_column(Float)
     budget_max: Mapped[float | None] = mapped_column(Float)
     currency: Mapped[str | None] = mapped_column(String(10))
-    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    published_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    first_seen_at: Mapped[datetime] = mapped_column(UTCDateTime())
+    last_seen_at: Mapped[datetime] = mapped_column(UTCDateTime())
     content_hash: Mapped[str | None] = mapped_column(String(128))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
 
 
 class NotificationOutbox(Base):
@@ -91,17 +93,17 @@ class NotificationOutbox(Base):
     payload_json: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(20), default="pending")
     attempts: Mapped[int] = mapped_column(default=0)
-    next_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    next_attempt_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    sent_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     telegram_message_id: Mapped[str | None] = mapped_column(String(100))
     last_error_code: Mapped[str | None] = mapped_column(String(100))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
 
 
 class TelegramUpdate(Base):
     __tablename__ = "telegram_updates"
     update_id: Mapped[int] = mapped_column(primary_key=True)
-    received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    received_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
 
 
 class Skill(Base):
@@ -134,7 +136,7 @@ class JobSnapshot(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"))
     content_hash: Mapped[str] = mapped_column(String(128))
-    changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    changed_at: Mapped[datetime] = mapped_column(UTCDateTime())
     snapshot_data: Mapped[str | None] = mapped_column(Text)
     __table_args__ = (UniqueConstraint("job_id", "content_hash"),)
 
@@ -146,4 +148,4 @@ class DailyMetric(Base):
     engagement_type: Mapped[str] = mapped_column(String(30), primary_key=True)
     metric_key: Mapped[str] = mapped_column(String(100), primary_key=True)
     metric_value: Mapped[float] = mapped_column(Float)
-    computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    computed_at: Mapped[datetime] = mapped_column(UTCDateTime())

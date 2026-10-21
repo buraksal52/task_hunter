@@ -12,6 +12,12 @@ class RawJob(BaseModel):
     description: str | None = None
     published_at: datetime | None = None
     expires_at: datetime | None = None
+    budget_type: str = "unknown"
+    budget_min: float | None = None
+    budget_max: float | None = None
+    currency: str | None = None
+    engagement_hint: str | None = None
+    remote_policy_hint: str | None = None
     raw_payload: dict | None = None
 
 
