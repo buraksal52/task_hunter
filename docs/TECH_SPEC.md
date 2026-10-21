@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Protocol
 from pydantic import BaseModel, HttpUrl
 
+
 class RawJob(BaseModel):
     source_key: str
     external_id: str | None = None
@@ -18,8 +19,10 @@ class RawJob(BaseModel):
     published_at: datetime | None = None
     raw_payload: dict | None = None  # never persist unless source policy permits
 
+
 class SourceAdapter(Protocol):
     source_key: str
+
     async def fetch_jobs(self, since: datetime | None, limit: int) -> list[RawJob]: ...
 ```
 Each adapter also exposes policy metadata: `allowed_method`, `minimum_poll_seconds`, `allows_description_storage`, `retention_days`, `attribution_required`, `verified_at`, `enabled`. Default `enabled=False` until approved.

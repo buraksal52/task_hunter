@@ -1,6 +1,6 @@
 # Freelance Hunter — Planning Pack v0.1
 
-**Status:** Implementation-ready planning baseline · **Date:** 2026-10-20 · **Language:** English for coding agents; product decisions agreed in Turkish.
+**Status:** Sprint 1 foundation implemented · **Date:** 2026-10-21 · **Language:** English for coding agents; product decisions agreed in Turkish.
 
 ## Mission
 Build a single-user, low-cost **Freelance + Remote Contract Market Intelligence** service. Collect permitted listings, normalize and deduplicate them, classify engagement types, extract technical skills, persist history, and deliver Telegram reports. Later add personalized ML ranking and human-approved proposals.
@@ -25,6 +25,23 @@ Build a single-user, low-cost **Freelance + Remote Contract Market Intelligence*
 
 ## Repository workflow
 This pack is documentation-only. Copy its files into a new `freelance-hunter` repository. Implement Sprint 1 first. Never treat example source names as approved sources.
+
+## Local setup
+
+Requirements: Python 3.12 and `uv`.
+
+```bash
+cp .env.example .env
+uv sync --dev
+uv run alembic upgrade head
+uv run uvicorn app.main:app --reload
+```
+
+Run checks with `uv run ruff check .` and `uv run pytest`. The default configuration keeps collection disabled and has no approved sources. `/hunt` reports that no approved sources are enabled; it does not claim a scan occurred.
+
+## Deployment baseline
+
+Deploy one container/replica on Railway with a persistent volume mounted at `/data`, `DATABASE_URL=sqlite:////data/hunter.db`, and the health check `/health/live`. Set secrets only as Railway variables. Telegram webhook registration and delivery require verified production secrets; neither is claimed by local tests.
 
 ## MVP definition of done
 Two **verified-permitted** sources, persistent normalized listings, engagement classification, deduplication, basic skill statistics, Telegram commands and daily report, collection health, restart recovery, tests and measured Railway usage. If two sources cannot be legally integrated, report blocker instead of violating policies.

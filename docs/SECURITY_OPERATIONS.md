@@ -20,5 +20,9 @@ Use consistent SQLite backup procedure; store backups outside the same volume wh
 ## Operational commands
 `/health` status, `/sources` source freshness and errors, `/hunt` manual enqueue, `/stats` aggregate summary. Ensure rate limiting for commands and authenticated admin routes.
 
+## Sprint 1 verified behavior
+
+`/health/live` is unauthenticated and returns only `{"status":"ok"}`. `/health/ready` performs a minimal database connectivity check. Telegram webhook requests require the configured secret header plus the configured user and chat IDs; duplicate `update_id` values are acknowledged without reprocessing. Admin API routes require `X-API-Key`. No source adapter is enabled in this sprint.
+
 ## Cost controls
 No always-on Chromium or loaded Transformer model. Cap HTTP requests, response bytes, concurrency and job counts per run. Log runtime duration, memory and source calls. A $5 included-usage target is not a spend guarantee.

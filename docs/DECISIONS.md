@@ -23,3 +23,9 @@
 - Exact report delivery hour and polling intervals after source review.
 - Whether full descriptions may be retained per source.
 - What additional Railway workloads share the monthly usage allowance?
+
+## ADR-007 — Sprint 1 source gate
+**Accepted.** The scheduler and worker are present but have no live adapters. Tasks are durably queued and honestly marked skipped until a source has a reviewed policy record and an enabled adapter. This prevents a public endpoint from being treated as permission to automate or retain data.
+
+## ADR-007 — Sprint 1 source gate
+**Accepted.** The scheduler and worker are present but have no live adapters. Tasks are durably queued and honestly marked skipped until a source has a reviewed policy record and an enabled adapter. This prevents a public endpoint from being treated as permission to automate or retain data.
