@@ -52,6 +52,7 @@ Case-insensitive alias matching with token boundaries; protect collisions (`Go` 
 | POST | `/telegram/webhook` | Telegram secret + allowlist | 200 quickly |
 | GET | `/api/v1/stats` | API key | aggregated counts |
 | GET | `/api/v1/jobs` | API key | paginated jobs with filters |
+| POST | `/api/v1/imports/manual` | API key | bounded user-supplied normalized import |
 | GET | `/api/v1/sources` | API key | source health |
 | POST | `/api/v1/collection-runs` | API key | 202 + queued task id |
 

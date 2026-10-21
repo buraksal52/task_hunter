@@ -43,3 +43,34 @@ def test_manual_import_requires_explicit_source_mode(client):
         session.commit()
         with pytest.raises(ValueError, match="manual user-supplied"):
             import_manual_jobs(session, source, [])
+
+
+def test_manual_import_endpoint_requires_admin_and_ingests_records(client):
+    assert client.post("/api/v1/imports/manual", json={}).status_code == 401
+    with client.app.state.session_factory() as session:
+        session.add(
+            Source(
+                source_key="manual_fiverr",
+                name="Manual Fiverr",
+                enabled=True,
+                policy_status="approved",
+                access_method="manual_user_supplied",
+            )
+        )
+        session.commit()
+    response = client.post(
+        "/api/v1/imports/manual",
+        headers={"X-API-Key": "admin-secret"},
+        json={
+            "source_key": "manual_fiverr",
+            "records": [
+                {
+                    "external_id": "endpoint-1",
+                    "url": "https://example.test/endpoint-1",
+                    "title": "Imported listing",
+                }
+            ],
+        },
+    )
+    assert response.status_code == 202
+    assert response.json()["created"] == 1

@@ -1,4 +1,5 @@
 from datetime import UTC, date, datetime, timedelta
+from typing import Any
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse, Response
@@ -10,6 +11,7 @@ from app.api.auth import admin_header, require_admin
 from app.collection.queue import enqueue_task
 from app.core.config import Settings
 from app.db.models import CollectionRun, Source
+from app.imports.manual import import_manual_jobs
 
 
 def build_router(settings: Settings, session_factory) -> APIRouter:
@@ -26,6 +28,28 @@ def build_router(settings: Settings, session_factory) -> APIRouter:
         start = start or (end - timedelta(days=6))
         with session_factory() as session:
             return market_stats(session, start, end)
+
+    @router.post("/imports/manual", status_code=202)
+    def manual_import(payload: dict[str, Any], api_key: str | None = Depends(admin_header)):
+        require_admin(settings, api_key)
+        source_key = payload.get("source_key")
+        records = payload.get("records")
+        if not isinstance(source_key, str) or not isinstance(records, list):
+            return Response(status_code=400, content="source_key and records are required")
+        with session_factory() as session:
+            source = session.scalar(select(Source).where(Source.source_key == source_key))
+            if source is None:
+                return Response(status_code=404, content="source not found")
+            try:
+                created, updated, skipped = import_manual_jobs(session, source, records)
+            except (TypeError, ValueError) as error:
+                return Response(status_code=400, content=str(error))
+            return {
+                "source_key": source_key,
+                "created": created,
+                "updated": updated,
+                "skipped": skipped,
+            }
 
     @router.get("/sources")
     def sources(api_key: str | None = Depends(admin_header)):
