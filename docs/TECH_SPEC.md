@@ -66,8 +66,10 @@ Use `PRAGMA journal_mode=WAL`, `busy_timeout=5000`, `foreign_keys=ON`. Short wri
 ## Retry and idempotency
 Source request retries only for transient network/429/5xx with rate-limit-aware delay and jitter; cap attempts. Unique task idempotency key per source/scheduled window; no concurrent same-source fetch. Unique notification event keys. `sent_at` means Telegram API acknowledged request, not that user read message.
 
+Immediate alerts are disabled by default. When explicitly enabled, only newly created eligible jobs (freelance project/hourly or remote contract, excluding onsite) enqueue a deduplicated Telegram outbox event keyed by source and external ID.
+
 ## Observability
 Structured JSON logs with `run_id`, `source_key`, duration, counts, error_code; redact tokens and URLs with credentials. Health endpoints must not expose DB contents or credentials. Basic metrics via DB queries; no paid monitoring dependency.
 
 ## Configuration example
-`DATABASE_URL=sqlite:////data/hunter.db`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ALLOWED_USER_ID`, `TELEGRAM_ALLOWED_CHAT_ID`, `ADMIN_API_KEY`, `APP_TIMEZONE=Europe/Istanbul`, `COLLECTION_ENABLED=false`, `DAILY_REPORT_HOUR=18`. Secrets in Railway variables; never commit `.env`.
+`DATABASE_URL=sqlite:////data/hunter.db`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ALLOWED_USER_ID`, `TELEGRAM_ALLOWED_CHAT_ID`, `ADMIN_API_KEY`, `APP_TIMEZONE=Europe/Istanbul`, `COLLECTION_ENABLED=false`, `INSTANT_ALERTS_ENABLED=false`, `DAILY_REPORT_HOUR=18`. Secrets in Railway variables; never commit `.env`.

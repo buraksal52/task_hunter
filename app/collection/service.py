@@ -19,6 +19,7 @@ async def collect_source(
     source: Source,
     now: datetime | None = None,
     limit: int = 100,
+    alert_chat_id: int | None = None,
 ) -> CollectionRun:
     now = now or datetime.now(UTC)
     run = CollectionRun(source_id=source.id, status="running", started_at=now)
@@ -44,7 +45,9 @@ async def collect_source(
             max_attempts=3,
         )
         run.fetched_count = len(raw_jobs)
-        created, updated, skipped = ingest_raw_jobs(session, source, raw_jobs, now)
+        created, updated, skipped = ingest_raw_jobs(
+            session, source, raw_jobs, now, alert_chat_id=alert_chat_id
+        )
         run.new_count = created
         run.updated_count = updated
         run.skipped_count = skipped

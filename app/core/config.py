@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     admin_api_key: SecretStr | None = None
     app_timezone: str = "Europe/Istanbul"
     collection_enabled: bool = False
+    instant_alerts_enabled: bool = False
     daily_report_hour: int = Field(default=18, ge=0, le=23)
 
     def validate_production(self) -> None:

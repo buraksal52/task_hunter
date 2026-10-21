@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.analytics.skills import persist_job_skills
 from app.db.models import Job, JobSnapshot, Source
 from app.normalization.jobs import NormalizedJob, normalize_job, retention_cutoff
+from app.notifications.alerts import enqueue_new_job_alert
 from app.sources.base import RawJob
 
 
@@ -69,6 +70,7 @@ def ingest_raw_jobs(
     source: Source,
     raw_jobs: list[RawJob],
     now: datetime | None = None,
+    alert_chat_id: int | None = None,
 ) -> tuple[int, int, int]:
     now = now or datetime.now(UTC)
     created_count = 0
@@ -81,6 +83,8 @@ def ingest_raw_jobs(
             persist_job_skills(
                 session, job.id, f"{normalized.title}\n{normalized.description or ''}"
             )
+            if created:
+                enqueue_new_job_alert(session, job, alert_chat_id)
             created_count += int(created)
             updated_count += int(changed and not created)
         except (ValueError, TypeError):

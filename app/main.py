@@ -23,7 +23,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         init_db(engine)
-        scheduler = configure_scheduler(session_factory) if settings.collection_enabled else None
+        scheduler = (
+            configure_scheduler(
+                session_factory,
+                alert_chat_id=(
+                    settings.telegram_allowed_chat_id if settings.instant_alerts_enabled else None
+                ),
+            )
+            if settings.collection_enabled
+            else None
+        )
         if scheduler:
             scheduler.start()
         app.state.scheduler = scheduler

@@ -10,7 +10,9 @@ from app.collection.queue import enqueue_task
 from app.db.models import Source
 
 
-def configure_scheduler(session_factory, tick_seconds: int = 60) -> AsyncIOScheduler:
+def configure_scheduler(
+    session_factory, tick_seconds: int = 60, alert_chat_id: int | None = None
+) -> AsyncIOScheduler:
     """Build the one-process scheduler; caller owns start/stop in application lifespan."""
     from app.collection.worker import process_once
 
@@ -19,7 +21,7 @@ def configure_scheduler(session_factory, tick_seconds: int = 60) -> AsyncIOSched
     async def tick() -> None:
         with session_factory() as session:
             schedule_due_sources(session)
-            await process_once(session, "scheduler-worker")
+            await process_once(session, "scheduler-worker", alert_chat_id=alert_chat_id)
 
     scheduler.add_job(
         tick,

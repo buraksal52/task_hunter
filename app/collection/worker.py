@@ -13,7 +13,7 @@ def run_once(session: Session, worker_id: str):
     return task
 
 
-async def process_once(session: Session, worker_id: str):
+async def process_once(session: Session, worker_id: str, alert_chat_id: int | None = None):
     task = claim_task(session, worker_id)
     if task is None:
         return None
@@ -26,7 +26,7 @@ async def process_once(session: Session, worker_id: str):
     if source is None:
         skip_unconfigured_source(session, task)
         return task
-    run = await collect_source(session, source)
+    run = await collect_source(session, source, alert_chat_id=alert_chat_id)
     task.status = {
         "succeeded": "succeeded",
         "skipped": "skipped",

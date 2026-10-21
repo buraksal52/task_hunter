@@ -37,7 +37,7 @@ uv run alembic upgrade head
 uv run uvicorn app.main:app --reload
 ```
 
-Run checks with `uv run ruff check .` and `uv run pytest`. The default configuration keeps collection disabled and has no approved sources. `/hunt` reports that no approved sources are enabled; it does not claim a scan occurred. Analytics reports use UTC first-seen windows, exclude onsite-only jobs from eligible rankings, and show unknown classifications separately. Authenticated `/api/v1/sources` reports last success, freshness and latest run errors.
+Run checks with `uv run ruff check .` and `uv run pytest`. The default configuration keeps collection and immediate alerts disabled and has no approved sources. `/hunt` reports that no approved sources are enabled; it does not claim a scan occurred. Analytics reports use UTC first-seen windows, exclude onsite-only jobs from eligible rankings, and show unknown classifications separately. Authenticated `/api/v1/sources` reports last success, freshness and latest run errors. Set `INSTANT_ALERTS_ENABLED=true` only when Telegram allowlist configuration is ready.
 
 ## Deployment baseline
 

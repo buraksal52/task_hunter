@@ -18,7 +18,7 @@ Single service/replica, one Uvicorn worker, persistent volume `/data`, `DATABASE
 Use consistent SQLite backup procedure; store backups outside the same volume when feasible. Test restore at least once. On restart recover expired task leases and pending outbox messages. Document retention rules before ingesting source content.
 
 ## Operational commands
-`/health` status, `/sources` source freshness and errors, `/hunt` manual enqueue, `/stats` aggregate summary. Ensure rate limiting for commands and authenticated admin routes.
+`/health` status, `/sources` source freshness and errors, `/hunt` manual enqueue, `/stats` aggregate summary. Ensure rate limiting for commands and authenticated admin routes. Immediate alerts remain disabled unless `INSTANT_ALERTS_ENABLED=true` is explicitly configured.
 
 ## Sprint 1 verified behavior
 
