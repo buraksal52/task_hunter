@@ -42,6 +42,9 @@ notes:
 ## Browser automation rule
 Use Playwright only where explicitly allowed. Browser automation does not bypass terms or bot restrictions. No CAPTCHA solving, evasion, stealth plugins, session hijacking or unauthorized logged-in access. Browser-based visual LLM agents are outside MVP and require a separate cost/accuracy benchmark.
 
+## User-supplied import rule
+User-provided screenshots, OCR text, email contents or authorized export files may enter through a `manual_user_supplied` source mode. This mode never fetches source URLs, launches a browser or stores the original raw payload by default. It still requires an explicit source record, bounded record count, retention and a review of the originating platform's terms before enabling storage.
+
 ## Research decisions — reviewed 2026-10-21
 
 ### Remote OK — blocked pending written clarification

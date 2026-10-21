@@ -38,3 +38,6 @@
 
 ## ADR-011 — Rights-aware exports
 **Accepted.** Export endpoints expose normalized fields only, require admin authentication, omit descriptions when the source policy disallows description storage, and reapply source expiry/retention filters at export time. CSV uses an empty description cell for restricted sources rather than leaking stored content.
+
+## ADR-012 — User-supplied source mode
+**Accepted.** Non-API integrations may enter through a bounded `manual_user_supplied` path only. The path accepts user-provided records, screenshots/OCR output or authorized exports after external review; it never fetches URLs, launches a browser or persists raw payloads by default.

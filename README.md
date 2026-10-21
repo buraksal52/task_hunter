@@ -41,6 +41,8 @@ Run checks with `uv run ruff check .` and `uv run pytest`. The default configura
 
 For a consistent live SQLite backup, call `app.db.backup.backup_sqlite` and verify the artifact with `verify_sqlite_backup`; keep backups outside the application volume when possible.
 
+Non-API source material can use the bounded `manual_user_supplied` import path. It accepts user-provided records only; it does not fetch links, run Playwright or bypass source protections.
+
 ## Deployment baseline
 
 Deploy one container/replica on Railway with a persistent volume mounted at `/data`, `DATABASE_URL=sqlite:////data/hunter.db`, and the health check `/health/live`. Set secrets only as Railway variables. Telegram webhook registration and delivery require verified production secrets; neither is claimed by local tests.
