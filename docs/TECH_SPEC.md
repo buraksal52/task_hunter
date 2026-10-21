@@ -56,7 +56,7 @@ Case-insensitive alias matching with token boundaries; protect collisions (`Go` 
 | GET | `/api/v1/sources` | API key | source health |
 | POST | `/api/v1/collection-runs` | API key | 202 + queued task id |
 
-Pagination must have bounded page size; never return raw source payloads by default. `/hunt` enqueues one run per source or a batch with deduped task keys. `/stats` includes period, source, engagement type, sample size and unknown count.
+Pagination must have bounded page size; never return raw source payloads by default. `/hunt` enqueues one run per source or a batch with deduped task keys. `/stats` includes period, source, engagement type, sample size and unknown count. `/sources` includes the latest run duration, counts, status and error code.
 
 ## Telegram commands
 `/start` intro, `/hunt` enqueue scan, `/stats` summary, `/sources` status, `/health` lightweight health. Ignore unauthorized users/chats. Register webhook using HTTPS Railway URL, Telegram bot token and separate webhook secret. Verify secret with constant-time comparison. Prevent replay/duplicate processing using Telegram `update_id` unique storage or bounded retention.

@@ -11,6 +11,7 @@ from app.collection.scheduler import configure_scheduler
 from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
 from app.db.session import create_session_factory, init_db
+from app.notifications.telegram import TelegramSender
 
 logger = logging.getLogger("freelance_hunter")
 
@@ -23,14 +24,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         init_db(engine)
+        sender = (
+            TelegramSender(settings)
+            if settings.telegram_bot_token and settings.telegram_allowed_chat_id
+            else None
+        )
         scheduler = (
             configure_scheduler(
                 session_factory,
+                report_chat_id=settings.telegram_allowed_chat_id,
                 alert_chat_id=(
                     settings.telegram_allowed_chat_id if settings.instant_alerts_enabled else None
                 ),
+                report_hour=settings.daily_report_hour,
+                app_timezone=settings.app_timezone,
+                sender=sender,
+                collect_enabled=settings.collection_enabled,
             )
-            if settings.collection_enabled
+            if settings.collection_enabled or sender
             else None
         )
         if scheduler:

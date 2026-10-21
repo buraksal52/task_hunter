@@ -56,6 +56,7 @@ class CollectionRun(Base):
     new_count: Mapped[int] = mapped_column(default=0)
     updated_count: Mapped[int] = mapped_column(default=0)
     skipped_count: Mapped[int] = mapped_column(default=0)
+    duration_ms: Mapped[int | None] = mapped_column(Integer)
     error_code: Mapped[str | None] = mapped_column(String(100))
     error_message: Mapped[str | None] = mapped_column(Text)
 
@@ -79,6 +80,7 @@ class Job(Base):
     currency: Mapped[str | None] = mapped_column(String(10))
     published_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    notified_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     first_seen_at: Mapped[datetime] = mapped_column(UTCDateTime())
     last_seen_at: Mapped[datetime] = mapped_column(UTCDateTime())
     content_hash: Mapped[str | None] = mapped_column(String(128))

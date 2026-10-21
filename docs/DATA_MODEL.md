@@ -24,7 +24,7 @@
 - `published_at`: source-reported publication timestamp, nullable.
 - `first_seen_at`: first ingest time (immutable).
 - `last_seen_at`: most recent observed appearance.
-- `notified_at`: successful Telegram API acknowledgment, not a read receipt.
+- `notified_at`: successful Telegram API acknowledgment for an immediate job notification, not a read receipt.
 - Never assume listing is closed simply because a subsequent fetch omitted it.
 
 ## Budget semantics

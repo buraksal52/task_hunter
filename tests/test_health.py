@@ -41,6 +41,7 @@ def test_sources_reports_freshness_and_latest_run(client):
     assert payload["last_success_at"].startswith("2026-10-21T10:00:00")
     assert payload["latest_run"]["status"] == "failed"
     assert payload["latest_run"]["error_code"] == "timeout"
+    assert payload["latest_run"]["duration_ms"] is None
     assert payload["freshness_seconds"] >= 0
 
 

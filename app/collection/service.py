@@ -29,6 +29,7 @@ async def collect_source(
     if not source.enabled or source.policy_status != "approved" or factory is None:
         run.status = "skipped"
         run.finished_at = now
+        run.duration_ms = 0
         run.error_code = "SOURCE_DISABLED"
         session.commit()
         return run
@@ -36,6 +37,7 @@ async def collect_source(
     if not adapter.enabled:
         run.status = "skipped"
         run.finished_at = now
+        run.duration_ms = 0
         run.error_code = "ADAPTER_DISABLED"
         session.commit()
         return run
@@ -59,5 +61,6 @@ async def collect_source(
         run.error_code = type(error).__name__
         run.error_message = str(error)[:500]
     run.finished_at = now
+    run.duration_ms = max(0, int((run.finished_at - run.started_at).total_seconds() * 1000))
     session.commit()
     return run

@@ -15,7 +15,7 @@ CREATE TABLE collection_runs (
  status TEXT NOT NULL CHECK(status IN ('queued','running','succeeded','failed','skipped')),
  started_at TEXT, finished_at TEXT, fetched_count INTEGER NOT NULL DEFAULT 0,
  new_count INTEGER NOT NULL DEFAULT 0, updated_count INTEGER NOT NULL DEFAULT 0,
- skipped_count INTEGER NOT NULL DEFAULT 0, error_code TEXT, error_message TEXT
+ skipped_count INTEGER NOT NULL DEFAULT 0, duration_ms INTEGER, error_code TEXT, error_message TEXT
 );
 CREATE INDEX ix_collection_runs_source_started ON collection_runs(source_id, started_at);
 CREATE TABLE collection_tasks (
@@ -35,7 +35,7 @@ CREATE TABLE jobs (
  classification_confidence REAL, classification_evidence TEXT,
  budget_type TEXT NOT NULL DEFAULT 'unknown' CHECK(budget_type IN ('fixed','hourly','unknown')),
  budget_min REAL, budget_max REAL, currency TEXT,
- published_at TEXT, first_seen_at TEXT NOT NULL, last_seen_at TEXT NOT NULL,
+ published_at TEXT, expires_at TEXT, notified_at TEXT, first_seen_at TEXT NOT NULL, last_seen_at TEXT NOT NULL,
  content_hash TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
  UNIQUE(source_id, external_id)
 );

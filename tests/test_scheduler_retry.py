@@ -34,6 +34,16 @@ def test_retry_is_bounded_and_honors_retry_after():
     assert decide_retry(1, 3, status_code=400).retry is False
 
 
+def test_scheduler_contains_collection_and_daily_report_jobs(client):
+    scheduler = configure_scheduler(
+        client.app.state.session_factory,
+        report_chat_id=8,
+        report_hour=18,
+        collect_enabled=False,
+    )
+    assert {job.id for job in scheduler.get_jobs()} == {"collection-tick", "daily-report"}
+
+
 def test_scheduler_has_single_non_overlapping_tick(client):
     scheduler = configure_scheduler(client.app.state.session_factory, tick_seconds=3600)
     job = scheduler.get_job("collection-tick")

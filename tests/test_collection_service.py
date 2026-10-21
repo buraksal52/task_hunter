@@ -40,6 +40,7 @@ async def test_collect_source_persists_normalized_job_and_run(client):
         run = await collect_source(session, source, datetime(2026, 10, 21, 10, tzinfo=UTC), 10)
         assert run.status == "succeeded"
         assert run.new_count == 1
+        assert run.duration_ms is not None
 
 
 async def test_collect_source_skips_disabled_source(client):

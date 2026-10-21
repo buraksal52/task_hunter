@@ -43,3 +43,22 @@ async def test_outbox_delivery_marks_event_sent(client):
         event = session.scalar(select(NotificationOutbox))
         assert event.status == "sent"
         assert event.telegram_message_id == "42"
+
+
+@pytest.mark.asyncio
+async def test_outbox_delivery_recovers_sending_and_backoffs_failures(client):
+    with client.app.state.session_factory() as session:
+        enqueue_daily_report(session, date(2026, 10, 21), 8)
+        event = session.scalar(select(NotificationOutbox))
+        event.status = "sending"
+        session.commit()
+
+        class Sender:
+            async def send_message(self, chat_id, text):
+                raise RuntimeError("temporary failure")
+
+        now = datetime(2026, 10, 21, tzinfo=UTC)
+        assert await deliver_pending_events(session, Sender(), now) == 0
+        assert event.status == "pending"
+        assert event.attempts == 1
+        assert event.next_attempt_at > now

@@ -21,4 +21,8 @@ def test_alembic_upgrade_from_empty_database(tmp_path: Path, monkeypatch):
         "telegram_updates",
     } <= tables
     assert "expires_at" in {column["name"] for column in inspect(engine).get_columns("jobs")}
+    assert "notified_at" in {column["name"] for column in inspect(engine).get_columns("jobs")}
+    assert "duration_ms" in {
+        column["name"] for column in inspect(engine).get_columns("collection_runs")
+    }
     command.upgrade(config, "head")

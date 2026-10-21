@@ -35,5 +35,7 @@ Source-specific polling; intervals must comply with verified terms. Never assume
 
 Sprint 2 uses one APScheduler tick with `max_instances=1`. The tick enqueues only approved/enabled sources whose `minimum_poll_seconds` has elapsed, then processes at most one leased task. HTTP/network transient failures use capped exponential backoff and honor numeric `Retry-After`; permanent errors are not retried.
 
+The same scheduler runs the daily report cron and pending notification delivery when Telegram is configured. Delivery recovers stale `sending` events, uses bounded retry delays, and keeps collection polling disabled when `COLLECTION_ENABLED=false`.
+
 ## Growth path
 v0.2 add detailed analytics and new-job alerts; v0.3 optional embeddings/ranking in isolated short-lived worker; v0.4 human-approved proposals; v0.5 authorized submission adapters. Extract separate compute worker only after actual resource measurements.

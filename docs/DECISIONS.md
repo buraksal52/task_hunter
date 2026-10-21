@@ -41,3 +41,6 @@
 
 ## ADR-012 — User-supplied source mode
 **Accepted.** Non-API integrations may enter through a bounded `manual_user_supplied` path only. The path accepts user-provided records, screenshots/OCR output or authorized exports after external review; it never fetches URLs, launches a browser or persists raw payloads by default.
+
+## ADR-013 — Notification acknowledgement semantics
+**Accepted.** `jobs.notified_at` is written only after Telegram API acknowledgement for a `telegram.new_job` event. Daily reports do not mark individual jobs as notified; failed sends remain pending with bounded retry delay.

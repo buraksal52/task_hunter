@@ -9,4 +9,7 @@
 ## Operational gate evidence
 
 - [x] SQLite online backup and integrity verification utility with restore test.
+- [x] Daily report cron and outbox delivery worker wiring with retry/recovery tests.
+- [x] Authenticated paginated `/api/v1/jobs` endpoint with bounded filters.
+- [x] `expires_at` and `notified_at` synchronized across model, migrations and logical schema.
 - [ ] Production 7-day observation, Railway resource measurement and real Telegram delivery verification.

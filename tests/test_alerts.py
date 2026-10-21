@@ -1,9 +1,11 @@
 from datetime import UTC, datetime
 
+import pytest
 from sqlalchemy import select
 
 from app.collection.ingest import ingest_raw_jobs
-from app.db.models import NotificationOutbox, Source
+from app.db.models import Job, NotificationOutbox, Source
+from app.notifications.service import deliver_pending_events
 from app.sources.base import RawJob
 
 
@@ -52,3 +54,36 @@ def test_onsite_and_unknown_jobs_do_not_alert(client):
         ]
         ingest_raw_jobs(session, source, jobs, alert_chat_id=8)
         assert session.scalars(select(NotificationOutbox)).all() == []
+
+
+@pytest.mark.asyncio
+async def test_successful_alert_delivery_sets_notified_at(client):
+    with client.app.state.session_factory() as session:
+        source = Source(source_key="jobicy", name="Jobicy", enabled=True, policy_status="approved")
+        session.add(source)
+        session.commit()
+        ingest_raw_jobs(
+            session,
+            source,
+            [
+                RawJob(
+                    source_key="jobicy",
+                    external_id="notified-1",
+                    url="https://example.test/notified-1",
+                    title="Remote project",
+                    engagement_hint="project",
+                    remote_policy_hint="remote",
+                )
+            ],
+            datetime(2026, 10, 21, tzinfo=UTC),
+            alert_chat_id=8,
+        )
+
+        class Sender:
+            async def send_message(self, chat_id, text):
+                return {"result": {"message_id": 7}}
+
+        acknowledged_at = datetime(2026, 10, 21, 13, tzinfo=UTC)
+        assert await deliver_pending_events(session, Sender(), acknowledged_at) == 1
+        job = session.scalar(select(Job).where(Job.external_id == "notified-1"))
+        assert job.notified_at == acknowledged_at
