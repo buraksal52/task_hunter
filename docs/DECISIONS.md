@@ -27,5 +27,5 @@
 ## ADR-007 — Sprint 1 source gate
 **Accepted.** The scheduler and worker are present but have no live adapters. Tasks are durably queued and honestly marked skipped until a source has a reviewed policy record and an enabled adapter. This prevents a public endpoint from being treated as permission to automate or retain data.
 
-## ADR-007 — Sprint 1 source gate
-**Accepted.** The scheduler and worker are present but have no live adapters. Tasks are durably queued and honestly marked skipped until a source has a reviewed policy record and an enabled adapter. This prevents a public endpoint from being treated as permission to automate or retain data.
+## ADR-008 — Sprint 2 source policy gate
+**Accepted.** On 2026-10-21, Remote OK, Remotive, Freelancer.com, Jobicy and Himalayas were reviewed against official materials. Jobicy and Himalayas pass a bounded policy gate with attribution and source-specific retention rules; their adapters remain disabled until fixture and retention tests exist. Remote OK and Remotive lack sufficient retention/polling/storage clarity, while Freelancer.com has explicit restrictions that conflict with this aggregator-style use case.

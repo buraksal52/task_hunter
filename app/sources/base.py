@@ -11,6 +11,7 @@ class RawJob(BaseModel):
     title: str
     description: str | None = None
     published_at: datetime | None = None
+    expires_at: datetime | None = None
     raw_payload: dict | None = None
 
 
