@@ -21,15 +21,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging()
     settings = settings or get_settings()
     engine, session_factory = create_session_factory(settings)
+    sender = (
+        TelegramSender(settings)
+        if settings.telegram_bot_token and settings.telegram_allowed_chat_id
+        else None
+    )
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         init_db(engine)
-        sender = (
-            TelegramSender(settings)
-            if settings.telegram_bot_token and settings.telegram_allowed_chat_id
-            else None
-        )
         scheduler = (
             configure_scheduler(
                 session_factory,
@@ -78,7 +78,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except Exception:
             return JSONResponse(status_code=503, content={"status": "not_ready"})
 
-    app.include_router(build_telegram_router(settings, session_factory))
+    app.include_router(build_telegram_router(settings, session_factory, sender))
     app.include_router(build_admin_router(settings, session_factory))
     return app
 

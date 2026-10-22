@@ -1,3 +1,4 @@
+import logging
 import secrets
 from datetime import UTC, date, datetime
 
@@ -9,9 +10,14 @@ from app.collection.queue import enqueue_task
 from app.core.config import Settings
 from app.db.models import Source, TelegramUpdate
 from app.notifications.reports import format_daily_report
+from app.notifications.telegram import TelegramSender
+
+logger = logging.getLogger("freelance_hunter.telegram")
 
 
-def build_router(settings: Settings, session_factory) -> APIRouter:
+def build_router(
+    settings: Settings, session_factory, sender: TelegramSender | None = None
+) -> APIRouter:
     router = APIRouter()
 
     @router.post("/telegram/webhook")
@@ -76,6 +82,15 @@ def build_router(settings: Settings, session_factory) -> APIRouter:
                     "Command accepted; source health is available through the authenticated API."
                 )
             session.commit()
+        if sender and response.get("message"):
+            try:
+                await sender.send_message(chat_id, response["message"])
+            except Exception:
+                logger.warning(
+                    "telegram command response delivery failed",
+                    extra={"command": command},
+                    exc_info=True,
+                )
         return response
 
     return router

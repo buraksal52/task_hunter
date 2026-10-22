@@ -1,4 +1,10 @@
+import httpx
+import respx
+from fastapi.testclient import TestClient
+from pydantic import SecretStr
+
 from app.db.models import CollectionTask, TelegramUpdate
+from app.main import create_app
 
 
 def payload(update_id=1, command="/hunt"):
@@ -55,3 +61,23 @@ def test_stats_returns_real_scoped_report(client):
     )
     assert response.status_code == 200
     assert "market report" in response.json()["message"]
+
+
+@respx.mock
+def test_command_response_is_sent_to_telegram(settings):
+    settings.telegram_bot_token = SecretStr("bot-token")
+    route = respx.post("https://api.telegram.org/botbot-token/sendMessage").mock(
+        return_value=httpx.Response(200, json={"ok": True, "result": {"message_id": 1}})
+    )
+    with TestClient(create_app(settings)) as test_client:
+        response = test_client.post(
+            "/telegram/webhook",
+            headers={"X-Telegram-Bot-Api-Secret-Token": "test-secret"},
+            json=payload(update_id=200, command="/start"),
+        )
+    assert response.status_code == 200
+    assert response.json()["message"].startswith("Freelance Hunter is ready")
+    assert route.called
+    assert route.calls[0].request.content == (
+        b'{"chat_id":8,"text":"Freelance Hunter is ready. Use /hunt to scan approved sources."}'
+    )
