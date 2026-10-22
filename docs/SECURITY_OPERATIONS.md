@@ -18,7 +18,7 @@ Use the repository `railway.toml` configuration: root `Dockerfile`, `/health/liv
 Use `app.db.backup.backup_sqlite` for a consistent SQLite online backup, store backups outside the same volume when feasible, and verify with `verify_sqlite_backup`. Test restore at least once. On restart recover expired task leases, pending outbox messages and stale `sending` notifications. Document retention rules before ingesting source content.
 
 ## Operational commands
-`/health` status, `/sources` source freshness and errors, `/hunt` manual enqueue, `/stats` aggregate summary. Ensure rate limiting for commands and authenticated admin routes. Immediate alerts remain disabled unless `INSTANT_ALERTS_ENABLED=true` is explicitly configured.
+`/health/live` is the minimal liveness endpoint and `/health/ready` checks database readiness. Telegram supports `/health`, `/sources`, `/hunt` and `/stats`; the admin API exposes source freshness and aggregate data behind `X-API-Key`. Ensure rate limiting for commands and authenticated admin routes. Immediate alerts remain disabled unless `INSTANT_ALERTS_ENABLED=true` is explicitly configured.
 
 ## Sprint 1 verified behavior
 

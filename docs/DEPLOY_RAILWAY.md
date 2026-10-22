@@ -2,6 +2,27 @@
 
 The repository contains `railway.toml` and a root `Dockerfile`. Railway should detect the Dockerfile automatically; the config sets one replica, `/health/live` health checking and restart-on-failure.
 
+## CLI deployment
+
+Run these commands from the repository root. Use `railway init` only when a new Railway project is needed; otherwise link the existing project and service.
+
+```bash
+railway login
+railway link --project <PROJECT_ID> --environment production --service <SERVICE_NAME>
+railway status
+railway up
+```
+
+For a detached deploy, use `railway up -d`. For CI, use a project-scoped `RAILWAY_TOKEN` and `railway up --ci`. The source-code deploy command is `railway up`; `railway deploy` is for Railway templates.
+
+Set variables from the CLI with `railway variable set KEY=value`. Send secret values through stdin instead of placing them in shell history:
+
+```bash
+printf '%s' '<ADMIN_API_KEY>' | railway variable set ADMIN_API_KEY --stdin
+```
+
+The persistent Volume still needs to be created and mounted at `/data` in the Railway service; `railway.toml` does not create storage.
+
 ## Service setup
 
 1. Create or select one Railway project and one service for this repository.

@@ -70,11 +70,11 @@ Next: FH-009 source permission research
 
 ```
 Completed: FH-001–FH-007; FH-008 implementation, tests and documentation
-Tests: uv run ruff check .; uv run pytest — 9 passed; Alembic upgrade twice — passed
+Tests: `UV_CACHE_DIR=/tmp/freelance-hunter-uv-cache uv run ruff check .`; `uv run pytest` — 47 passed, 1 dependency deprecation warning; Alembic upgrade twice — passed; `railway.toml` parse — passed
 Manual smoke: /health/live, /health/ready and authorized /hunt — passed locally
 Deployment: not performed; no Railway URL or deployment access verified
 Database persistence: migration and local SQLite persistence tested
 Railway resource usage: not yet measured
-Risks/blockers: Docker daemon unavailable locally; Railway deployment measurement remains external
+Risks/blockers: Docker daemon was unavailable during local image verification; Railway deployment, resource measurement and production Telegram delivery remain external
 Next: FH-009 source permission research
 ```
