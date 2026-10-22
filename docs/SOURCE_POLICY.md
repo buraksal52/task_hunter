@@ -8,6 +8,7 @@
 | Remote OK | Public feed/API candidate | Permitted polling, attribution, redistribution/storage? | BLOCKED / disabled |
 | Remotive | Public API/RSS candidate | Poll frequency, delayed publishing, storage and display restrictions? | BLOCKED / disabled |
 | Freelancer.com | Official developer API candidate | Account/API approval, rate limits, permitted listing access? | BLOCKED / disabled |
+| Upwork | Official OAuth 2.0/GraphQL API candidate | API key approval, public marketplace job scope, callback and retention rules? | PENDING API approval / disabled |
 | Jobicy | Official API/RSS documentation | Attribution, own-app use, polling and cache rules? | APPROVED / Source.enabled=false by default |
 | Himalayas | Official API/RSS documentation | Own-app display, attribution, expiry and request rules? | APPROVED / Source.enabled=false by default |
 | Other RSS feeds | RSS candidate | Feed usage rights, polling, description retention? | UNVERIFIED / disabled |
@@ -109,6 +110,27 @@ notes: API T&Cs restrict replication/competition, redistribution/syndication, ca
 ```
 
 Evidence: [Freelancer API Terms](https://www.freelancer.com/about/apiterms), [Freelancer User Agreement](https://www.freelancer.com/about/terms), and [Freelancer Developer Portal](https://developers.freelancer.com/).
+
+### Upwork — pending API approval
+
+```text
+source_key: upwork
+reviewed_at: 2026-10-22
+terms_url: https://www.upwork.com/legal
+api_docs_url: https://www.upwork.com/developer/documentation/graphql/api/docs/index.html
+allowed_access_method: official OAuth 2.0/GraphQL API only; no website scraping or browser automation
+allowed_fields: not finalized; public marketplace job posting fields only after API approval
+retention_days: not finalized; follow the approved API scope and current terms
+attribution_required: not finalized
+minimum_poll_seconds: not finalized; follow API limits and approved use case
+auth_required: yes — approved Upwork application and OAuth credentials
+publication_latency_notes: not finalized
+status: pending API approval
+reviewer: Freelance Hunter implementation agent
+notes: The application was registered with read-only common entities, public marketplace job postings and read-only job details. The key is currently disabled. Do not enable an adapter, persist Upwork content, or use a browser agent until Upwork approves the application and the callback/token flow is implemented and tested.
+```
+
+Evidence: [Upwork API documentation](https://www.upwork.com/developer/documentation/graphql/api/docs/index.html), [Upwork automation guidance](https://support.upwork.com/hc/en-us/articles/43342677368467-Use-bots-and-other-automation-properly), and [Upwork Legal Center](https://www.upwork.com/legal).
 
 ### Jobicy — approved with conservative retention
 
