@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from alembic.config import Config
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine, inspect, text
 
 from alembic import command
 
@@ -25,4 +25,9 @@ def test_alembic_upgrade_from_empty_database(tmp_path: Path, monkeypatch):
     assert "duration_ms" in {
         column["name"] for column in inspect(engine).get_columns("collection_runs")
     }
+    with engine.connect() as connection:
+        source_rows = connection.execute(
+            text("SELECT source_key, enabled, policy_status FROM sources ORDER BY source_key")
+        ).all()
+    assert source_rows == [("himalayas", False, "approved"), ("jobicy", False, "approved")]
     command.upgrade(config, "head")
