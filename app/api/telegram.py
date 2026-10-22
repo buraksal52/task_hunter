@@ -1,5 +1,5 @@
 import secrets
-from datetime import UTC, date
+from datetime import UTC, date, datetime
 
 from fastapi import APIRouter, Header, HTTPException, Request, status
 from sqlalchemy import select
@@ -55,8 +55,6 @@ def build_router(settings: Settings, session_factory) -> APIRouter:
                 if not sources:
                     response["message"] = "No approved sources are enabled."
                 else:
-                    from datetime import datetime
-
                     for source in sources:
                         enqueue_task(
                             session,

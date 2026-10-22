@@ -44,3 +44,6 @@
 
 ## ADR-013 — Notification acknowledgement semantics
 **Accepted.** `jobs.notified_at` is written only after Telegram API acknowledgement for a `telegram.new_job` event. Daily reports do not mark individual jobs as notified; failed sends remain pending with bounded retry delay.
+
+## ADR-014 — Structured collection/notification logging
+**Accepted.** `collect_source` now emits one structured JSON log line per completed collection run (`run_id`, `source_key`, `duration_ms`, fetched/new/updated/skipped counts, `error_code`), at `WARNING` for `skipped`/`failed` runs and `INFO` for `succeeded` runs. Outbox delivery failures log `error_code` only. Exception text and payload bodies (which may contain source/Telegram URLs) are never logged, only stored on `collection_runs.error_message` for internal inspection; this satisfies the TECH_SPEC observability requirement without risking token/URL leakage. Closes the previously unimplemented logging gap identified in repo review.

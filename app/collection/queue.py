@@ -47,7 +47,8 @@ def claim_task(
 ):
     now = now or datetime.now(UTC)
     recover_expired_leases(session, now)
-    # SQLite has no row-level FOR UPDATE; serialize the short claim transaction.
+    # SQLite has no row-level FOR UPDATE; BEGIN IMMEDIATE takes a write lock for the
+    # whole connection, which is what actually serializes the claim below.
     session.connection().exec_driver_sql("BEGIN IMMEDIATE")
     task = session.scalar(
         select(CollectionTask)
@@ -64,7 +65,6 @@ def claim_task(
             ),
         )
         .order_by(CollectionTask.scheduled_at, CollectionTask.id)
-        .with_for_update()
     )
     if not task:
         return None

@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
 from app.api.admin import build_router as build_admin_router
 from app.api.telegram import build_router as build_telegram_router
@@ -72,7 +73,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def ready():
         try:
             with session_factory() as session:
-                session.execute(__import__("sqlalchemy").text("SELECT 1"))
+                session.execute(text("SELECT 1"))
             return {"status": "ready"}
         except Exception:
             return JSONResponse(status_code=503, content={"status": "not_ready"})

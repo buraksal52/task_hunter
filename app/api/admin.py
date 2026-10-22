@@ -183,8 +183,6 @@ def build_router(settings: Settings, session_factory) -> APIRouter:
     @router.post("/collection-runs", status_code=202)
     def collection_runs(api_key: str | None = Depends(admin_header)):
         require_admin(settings, api_key)
-        from datetime import datetime
-
         with session_factory() as session:
             sources = session.scalars(
                 select(Source).where(Source.enabled.is_(True), Source.policy_status == "approved")

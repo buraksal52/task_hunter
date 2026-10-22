@@ -1,7 +1,7 @@
 # Technical Specification — v0.1
 
 ## Stack
-Python 3.12, uv, FastAPI, Uvicorn, Pydantic v2 + pydantic-settings, httpx, feedparser, SQLAlchemy 2, Alembic, SQLite (WAL), APScheduler, pytest, pytest-asyncio, respx, Ruff. Telegram Bot HTTP API via httpx. Docker on Railway.
+Python 3.12, uv, FastAPI, Uvicorn, Pydantic v2 + pydantic-settings, httpx, SQLAlchemy 2, Alembic, SQLite (WAL), APScheduler, pytest, pytest-asyncio, respx, Ruff. Telegram Bot HTTP API via httpx. Docker on Railway. Both current adapters (Jobicy, Himalayas) consume official JSON APIs over httpx; `feedparser` is not a dependency unless a future RSS-only source requires it.
 
 ## Core interfaces
 ```python

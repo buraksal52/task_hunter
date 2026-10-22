@@ -1,12 +1,15 @@
 """Durable Telegram outbox delivery boundary."""
 
 import json
+import logging
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.models import Job, NotificationOutbox
+
+logger = logging.getLogger("freelance_hunter.notifications")
 
 
 async def deliver_pending_events(session: Session, sender, now: datetime | None = None) -> int:
@@ -37,12 +40,16 @@ async def deliver_pending_events(session: Session, sender, now: datetime | None 
             event.status = "pending"
             event.last_error_code = "telegram_delivery_failed"
             event.next_attempt_at = now + timedelta(seconds=min(3600, 60 * (2**event.attempts)))
+            logger.warning(
+                "notification_delivery_failed",
+                extra={"error_code": event.last_error_code},
+            )
         else:
             event.status = "sent"
             event.sent_at = now
             event.telegram_message_id = str(result.get("result", {}).get("message_id", "")) or None
             if event.event_type == "telegram.new_job":
-                job_id = json.loads(event.payload_json).get("job_id")
+                job_id = payload.get("job_id")
                 if job_id:
                     job = session.get(Job, job_id)
                     if job:

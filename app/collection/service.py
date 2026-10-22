@@ -1,3 +1,4 @@
+import logging
 from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
@@ -8,10 +9,30 @@ from app.db.models import CollectionRun, Source
 from app.sources.himalayas import HimalayasAdapter
 from app.sources.jobicy import JobicyAdapter
 
+logger = logging.getLogger("freelance_hunter.collection")
+
 ADAPTER_FACTORIES = {
     "jobicy": JobicyAdapter,
     "himalayas": HimalayasAdapter,
 }
+
+
+def _log_run(run: CollectionRun, source: Source) -> None:
+    level = logging.WARNING if run.status in {"failed", "skipped"} else logging.INFO
+    logger.log(
+        level,
+        "collection_run_finished",
+        extra={
+            "run_id": run.id,
+            "source_key": source.source_key,
+            "duration_ms": run.duration_ms,
+            "fetched_count": run.fetched_count,
+            "new_count": run.new_count,
+            "updated_count": run.updated_count,
+            "skipped_count": run.skipped_count,
+            "error_code": run.error_code,
+        },
+    )
 
 
 async def collect_source(
@@ -32,6 +53,7 @@ async def collect_source(
         run.duration_ms = 0
         run.error_code = "SOURCE_DISABLED"
         session.commit()
+        _log_run(run, source)
         return run
     adapter = factory()
     if not adapter.enabled:
@@ -40,6 +62,7 @@ async def collect_source(
         run.duration_ms = 0
         run.error_code = "ADAPTER_DISABLED"
         session.commit()
+        _log_run(run, source)
         return run
     try:
         raw_jobs = await fetch_with_retry(
@@ -63,4 +86,5 @@ async def collect_source(
     run.finished_at = now
     run.duration_ms = max(0, int((run.finished_at - run.started_at).total_seconds() * 1000))
     session.commit()
+    _log_run(run, source)
     return run
