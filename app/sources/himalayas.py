@@ -13,7 +13,7 @@ class HimalayasAdapter:
     allows_description_storage = True
     retention_days = None
     attribution_required = True
-    verified_at = "2026-10-21"
+    verified_at = "2026-10-23"
     enabled = True
 
     def __init__(
@@ -51,6 +51,7 @@ class HimalayasAdapter:
         url = guid if guid.startswith("http") else f"https://himalayas.app/jobs/{guid}"
         period = str(item.get("salaryPeriod") or "").lower()
         budget_type = "hourly" if "hour" in period else "fixed" if period else "unknown"
+        budget_min, budget_max = _salary_bounds(item)
         return RawJob(
             source_key="himalayas",
             external_id=str(item["guid"]),
@@ -60,8 +61,8 @@ class HimalayasAdapter:
             published_at=published_at,
             expires_at=expires_at,
             budget_type=budget_type,
-            budget_min=item.get("minSalary"),
-            budget_max=item.get("maxSalary"),
+            budget_min=budget_min,
+            budget_max=budget_max,
             currency=item.get("currency"),
             engagement_hint=item.get("employmentType"),
             remote_policy_hint="remote",
@@ -72,3 +73,26 @@ def _unix_datetime(value: Any) -> datetime | None:
     if value is None:
         return None
     return datetime.fromtimestamp(float(value), tz=UTC)
+
+
+def _salary_bounds(item: dict[str, Any]) -> tuple[float | None, float | None]:
+    """Support the current salary object as well as the legacy flat fields."""
+    salaries = item.get("salaries")
+    if isinstance(salaries, list):
+        values = [salary for salary in salaries if isinstance(salary, dict)]
+        minimums = [_number(salary.get("min")) for salary in values]
+        maximums = [_number(salary.get("max")) for salary in values]
+        minimums = [value for value in minimums if value is not None]
+        maximums = [value for value in maximums if value is not None]
+        if minimums or maximums:
+            return (min(minimums) if minimums else None, max(maximums) if maximums else None)
+    return _number(item.get("minSalary")), _number(item.get("maxSalary"))
+
+
+def _number(value: Any) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None

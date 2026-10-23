@@ -29,3 +29,18 @@ Priority P0 required for MVP, P1 next release, P2 optional. Each item must be tr
 | FH-023 | P2 | ML | Weighted personalized ranker | FH-016 | explainable scores, labeled feedback |
 | FH-024 | P2 | Proposals | Human-approved proposal drafts | FH-023 | no unsupported claims |
 | FH-025 | P2 | Applications | Authorized submission integration | FH-024 | explicit approval + idempotency |
+
+## Reprioritized MVP source plan — 2026-10-23
+
+These tickets refine FH-009–FH-014 without treating an unapproved source as implemented. A source adapter may be enabled only after its acceptance criteria and the source policy record are complete.
+
+| ID | Priority | Source | Task | Acceptance |
+|---|---|---|---|---|
+| FH-026 | P0 | Freelancer.com | Obtain express written permission and approved read-only API scope | Official response records allowed endpoints/fields, rate limits, attribution, retention, display and automation restrictions; no code before approval |
+| FH-027 | P0 | Himalayas | Maintain the approved adapter against the current API contract | Mocked paginated/current-field fixtures cover `guid`, `applicationLink`, `pubDate`, `expiryDate`, employment type, salary and sanitized HTML; daily cadence and expiry behavior are tested |
+| FH-028 | P0 | Remote OK | Resolve feed operational policy before implementation | Official clarification records polling, retention, description storage and takedown rules; only then add mocked JSON/RSS adapter and attribution tests |
+| FH-029 | P1 | Source operations | Verify source-specific freshness and notification behavior | Enabled approved sources produce durable collection metrics and eligible-only new-job notifications without redistributing restricted listings |
+| FH-030 | P2 | Browser | Isolated permitted Playwright adapter benchmark | Source-specific written permission, isolated process, memory/latency measurement and no CAPTCHA/anti-bot bypass |
+| FH-031 | P1 | Upwork | Implement OAuth/API adapter after approval | Approval evidence, callback/state/token tests, read-only public job scope, retention/rate-limit tests; no scraping |
+
+Explicitly out of scope for this plan: Fiverr scraping/API discovery without permission, OCR/visual LLM agents, browser automation used to bypass access controls, and auto-apply.

@@ -39,6 +39,8 @@ uv run uvicorn app.main:app --reload
 
 Run checks with `uv run ruff check .` and `uv run pytest`. The default configuration keeps collection and immediate alerts disabled and has no approved sources. `/hunt` reports that no approved sources are enabled; it does not claim a scan occurred. Analytics reports use UTC first-seen windows, exclude onsite-only jobs from eligible rankings, show unknown classifications separately, and keep budget currencies/types separate. Authenticated `/api/v1/sources` reports last success, freshness and latest run errors. `/api/v1/jobs/export` provides authenticated rights-aware JSON/CSV exports. Set `INSTANT_ALERTS_ENABLED=true` only when Telegram allowlist configuration is ready.
 
+Current MVP source gate: Himalayas is the confirmed implemented adapter; Freelancer.com is a priority approval task blocked pending express written permission; Remote OK feed access is documented but its retention/polling/takedown rules still require clarification. Upwork remains pending API approval, Fiverr remains blocked, and no scraping, OCR, visual LLM agent or browser automation bypass is part of the MVP.
+
 For a consistent live SQLite backup, call `app.db.backup.backup_sqlite` and verify the artifact with `verify_sqlite_backup`; keep backups outside the application volume when possible.
 
 Non-API source material can use the authenticated `POST /api/v1/imports/manual` endpoint with a source configured as `manual_user_supplied`. It accepts user-provided records only; it does not fetch links, run Playwright or bypass source protections.

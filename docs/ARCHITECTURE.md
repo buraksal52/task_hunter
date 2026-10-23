@@ -27,6 +27,19 @@ One Railway service, one container, one Uvicorn worker, persistent volume mounte
 - `notifications`: durable outbox and Telegram delivery.
 - `db`: ORM, migrations and transactions.
 
+## Source integration boundary
+
+Every adapter is a read-only boundary from one approved source into the canonical job model. The policy record is part of the adapter contract: access method, authentication, rate limit, minimum poll interval, allowed fields, attribution, retention and takedown behavior must be known before a source row can be enabled.
+
+Current MVP source states:
+
+- Himalayas: approved and implemented; daily refresh, expiry-aware retention and attribution.
+- Freelancer.com: priority approval ticket; blocked until express written permission and an approved API scope are recorded.
+- Remote OK: priority clarification ticket; feed access is documented, but retention/polling/storage/takedown rules are not complete, so no adapter yet.
+- Upwork: pending API approval; no scraping or browser automation.
+
+The normalized mapping is source-specific only at the adapter edge. Adapters emit canonical identifiers, title, description/excerpt, source URL, timestamps, location, budget/currency, source type and skills; they do not submit proposals or mutate source records. A source may provide general employment listings, but classification and notification eligibility remain separate from ingestion. Playwright, if ever approved, runs in an isolated optional adapter; OCR and visual/LLM agents are not MVP components.
+
 ## Reliability boundaries
 Webhook acknowledges only after queue record commits. Worker leases tasks atomically, heartbeats or uses bounded execution; expired leases are reclaimed. Retry transient failures with exponential backoff and capped attempts; permanent failures move to `failed`. Per-source schedule enforces minimum interval. Use outbox unique `event_key` to avoid duplicate intent; Telegram API may still produce rare duplicates if a send succeeds but acknowledgment is lost. On shutdown stop claiming new work and finish/expire leases safely.
 

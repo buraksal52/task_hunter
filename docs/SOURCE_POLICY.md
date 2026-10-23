@@ -5,9 +5,9 @@
 ## Candidate research queue
 | Candidate | Possible access | Main question | Status |
 |---|---|---|---|
-| Remote OK | Public feed/API candidate | Permitted polling, attribution, redistribution/storage? | BLOCKED / disabled |
+| Remote OK | Public JSON/RSS feed | Retention, polling, raw description storage and takedown rules? | PENDING clarification / disabled |
 | Remotive | Public API/RSS candidate | Poll frequency, delayed publishing, storage and display restrictions? | BLOCKED / disabled |
-| Freelancer.com | Official developer API candidate | Account/API approval, rate limits, permitted listing access? | BLOCKED / disabled |
+| Freelancer.com | Official developer API candidate | Express written permission, API scope, rate limits and storage rights? | BLOCKED pending written permission / disabled |
 | Upwork | Official OAuth 2.0/GraphQL API candidate | API key approval, public marketplace job scope, callback and retention rules? | PENDING API approval / disabled |
 | Fiverr | Official API or partner access candidate | Written permission/API scope for listing access, storage and automation? | BLOCKED / manual-only until approved |
 | Jobicy | Official API/RSS documentation | Attribution, own-app use, polling and cache rules? | APPROVED / Source.enabled=false by default |
@@ -49,23 +49,23 @@ User-provided screenshots, OCR text, email contents or authorized export files m
 
 ## Research decisions — reviewed 2026-10-21
 
-### Remote OK — blocked pending written clarification
+### Remote OK — feed access confirmed; integration pending operational clarification
 
 ```text
 source_key: remote_ok
-reviewed_at: 2026-10-21
+reviewed_at: 2026-10-23
 terms_url: https://remoteok.com/legal
 api_docs_url: https://remoteok.com/faq
-allowed_access_method: public JSON feed or RSS; no authentication stated
-allowed_fields: not finalized; metadata-only candidate
+allowed_access_method: public JSON feed (`https://remoteok.com/api`) or RSS (`https://remoteok.com/remote-jobs.rss`); no authentication stated
+allowed_fields: listing metadata needed for title, canonical URL, description excerpt, publication date, salary, tags and location; final storage scope pending clarification
 retention_days: not specified
 attribution_required: yes — credit Remote OK and link to the original job URL
-minimum_poll_seconds: not specified
+minimum_poll_seconds: not specified; do not schedule automated polling until confirmed
 auth_required: no
 publication_latency_notes: not specified
-status: blocked
+status: pending clarification
 reviewer: Freelance Hunter implementation agent
-notes: The official FAQ provides JSON/RSS feeds and permits aggregators/sharing with credit and original links. The official terms require a hyperlink where API/site data is used, but do not define retention, polling, description/raw-payload storage, or takedown handling.
+notes: The official FAQ explicitly provides JSON/RSS feeds and permits aggregators/sharing when Remote OK is credited and the original job URL is linked. It does not define retention, polling cadence, description/raw-payload storage or takedown handling. Do not implement or enable the adapter until those operational rules are confirmed. Candidate normalized mapping: feed id/slug -> external_id; position -> title; description -> description_html; url -> source_url; date -> published_at; salary_min/max -> budget fields; tags/location -> skills/location; source attribution remains mandatory.
 ```
 
 Evidence: [Remote OK FAQ](https://remoteok.com/faq) and [Remote OK Terms](https://remoteok.com/legal).
@@ -91,23 +91,23 @@ notes: Official API guidance allows sharing jobs further, requires attribution/l
 
 Evidence: [Remotive Public API](https://remotive.com/remote-jobs/api) and [Remotive Terms](https://support.remotive.com/en/article/terms-of-service-u4kbkf/).
 
-### Freelancer.com — blocked for this MVP use case
+### Freelancer.com — MVP priority, but blocked pending express permission
 
 ```text
 source_key: freelancer_com
-reviewed_at: 2026-10-21
+reviewed_at: 2026-10-23
 terms_url: https://www.freelancer.com/about/terms
 api_docs_url: https://developers.freelancer.com/
-allowed_access_method: official API only, subject to accepted API T&Cs
+allowed_access_method: official API only, subject to accepted API T&Cs and express written permission for this use case
 allowed_fields: not approved
 retention_days: cache refresh at least every 24 hours; broader storage permission unclear
 attribution_required: not specified as a substitute for storage restrictions
 minimum_poll_seconds: exact limit not verified; reasonable request volume required
 auth_required: API agreement/account required
 publication_latency_notes: not specified
-status: blocked
+status: blocked pending written permission
 reviewer: Freelance Hunter implementation agent
-notes: API T&Cs restrict replication/competition, redistribution/syndication, caching and storage; they require strong encryption and deletion after termination unless otherwise agreed. This aggregator use case requires explicit written approval.
+notes: The User Agreement prohibits automated access to the website, including API access, without express written permission. API terms also prohibit replicating/competing with Freelancer services and selling, redistributing or syndicating API access. The MVP source plan therefore prioritizes obtaining written permission and an approved read-only listing scope; it does not authorize an adapter yet. Candidate normalized mapping after approval: project id -> external_id; title/description -> job fields; project URL -> source_url; budget currency/min/max -> budget fields; submit date -> published_at; skill tags -> skills; remote/project classification -> engagement type. No write endpoints or auto-apply.
 ```
 
 Evidence: [Freelancer API Terms](https://www.freelancer.com/about/apiterms), [Freelancer User Agreement](https://www.freelancer.com/about/terms), and [Freelancer Developer Portal](https://developers.freelancer.com/).
@@ -175,23 +175,23 @@ notes: Official documentation explicitly permits use in applications, research t
 
 Evidence: [Jobicy API documentation and fair-use rules](https://github.com/Jobicy/remote-jobs-api).
 
-### Himalayas — approved with expiry-based cleanup
+### Himalayas — approved MVP adapter
 
 ```text
 source_key: himalayas
-reviewed_at: 2026-10-21
+reviewed_at: 2026-10-23
 terms_url: https://himalayas.app/terms
 api_docs_url: https://himalayas.app/docs/data-dictionary
 allowed_access_method: official JSON API or RSS; API key rules apply where a key is used
-allowed_fields: title, excerpt, company, employment type, salary, location restrictions, categories, description, publication/expiry timestamps, application URL and GUID; preserve attribution
+allowed_fields: title, excerpt, company, employment type, salary and period, currency, location/timezone restrictions, categories, sanitized HTML description, publication/expiry timestamps, application URL and GUID; preserve attribution
 retention_days: expiry-driven; remove jobs once source expiry is reached
 attribution_required: yes — visible Himalayas source link
-minimum_poll_seconds: source request limits apply; use conservative hourly polling until a specific limit is confirmed
-auth_required: public job data; key requirements depend on endpoint
-publication_latency_notes: expiryDate is supplied and jobs may close earlier
+minimum_poll_seconds: 86400 for the full feed; the API refreshes daily and polling more often provides no benefit
+auth_required: public JSON API without a key; optional key allows higher limits (60 requests/minute and 10,000/day)
+publication_latency_notes: full feed and search are paginated; `pubDate` and `expiryDate` are supplied, and jobs may close earlier
 status: approved
 reviewer: Freelance Hunter implementation agent
-notes: Official terms allow personal/commercial integrations on sites/apps operated by the integrator, require attribution, prohibit passing listings to third-party job boards/aggregators, require caching where possible and removal after expiry. Telegram output remains part of the user's own application; no redistribution adapter is authorized.
+notes: Official terms allow personal/commercial integrations on sites/apps operated by the integrator, require attribution, prohibit passing listings to third-party job boards/aggregators, require caching where possible and removal after expiry. Telegram output remains part of the user's own application; no redistribution adapter is authorized. The existing adapter maps `guid`/URL, title, sanitized description, publication/expiry, salary and employment type into the canonical job model. Full-time and part-time listings may be stored but remain outside eligible freelance/contract alerts unless classified accordingly.
 ```
 
 Evidence: [Himalayas API terms](https://himalayas.app/terms) and [Himalayas data dictionary](https://himalayas.app/docs/data-dictionary).

@@ -50,3 +50,7 @@
 
 ## ADR-014 — Structured collection/notification logging
 **Accepted.** `collect_source` now emits one structured JSON log line per completed collection run (`run_id`, `source_key`, `duration_ms`, fetched/new/updated/skipped counts, `error_code`), at `WARNING` for `skipped`/`failed` runs and `INFO` for `succeeded` runs. Outbox delivery failures log `error_code` only. Exception text and payload bodies (which may contain source/Telegram URLs) are never logged, only stored on `collection_runs.error_message` for internal inspection; this satisfies the TECH_SPEC observability requirement without risking token/URL leakage. Closes the previously unimplemented logging gap identified in repo review.
+
+## ADR-015 — MVP source priority follows permission gates
+
+**Accepted 2026-10-23.** Freelancer.com, Himalayas and Remote OK are the requested MVP priorities, but priority does not override source permission. Himalayas is the only one of the three with a confirmed permitted API integration and remains the implemented adapter. Freelancer.com is blocked until express written permission and an approved read-only API scope are recorded because its current agreement/API terms restrict automated access, replication and redistribution. Remote OK feed access and attribution are documented, but retention, polling, description storage and takedown rules remain unresolved; it stays disabled until clarified. Upwork remains pending API approval, Fiverr remains blocked, and no browser automation, OCR or visual LLM agent is added to MVP.
