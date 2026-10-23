@@ -156,6 +156,23 @@ def build_router(settings: Settings, session_factory) -> APIRouter:
                 )
             return result
 
+    @router.post("/sources/{source_key}/enable")
+    def enable_source(source_key: str, api_key: str | None = Depends(admin_header)):
+        require_admin(settings, api_key)
+        with session_factory() as session:
+            source = session.scalar(select(Source).where(Source.source_key == source_key))
+            if source is None:
+                return Response(status_code=404, content="source not found")
+            if source.policy_status != "approved":
+                return Response(status_code=409, content="source policy is not approved")
+            source.enabled = True
+            session.commit()
+            return {
+                "source_key": source.source_key,
+                "enabled": source.enabled,
+                "policy_status": source.policy_status,
+            }
+
     @router.get("/jobs/export")
     def export(
         start: date | None = None,

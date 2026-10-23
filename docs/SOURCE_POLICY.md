@@ -9,6 +9,7 @@
 | Remotive | Public API/RSS candidate | Poll frequency, delayed publishing, storage and display restrictions? | BLOCKED / disabled |
 | Freelancer.com | Official developer API candidate | Account/API approval, rate limits, permitted listing access? | BLOCKED / disabled |
 | Upwork | Official OAuth 2.0/GraphQL API candidate | API key approval, public marketplace job scope, callback and retention rules? | PENDING API approval / disabled |
+| Fiverr | Official API or partner access candidate | Written permission/API scope for listing access, storage and automation? | BLOCKED / manual-only until approved |
 | Jobicy | Official API/RSS documentation | Attribution, own-app use, polling and cache rules? | APPROVED / Source.enabled=false by default |
 | Himalayas | Official API/RSS documentation | Own-app display, attribution, expiry and request rules? | APPROVED / Source.enabled=false by default |
 | Other RSS feeds | RSS candidate | Feed usage rights, polling, description retention? | UNVERIFIED / disabled |
@@ -131,6 +132,27 @@ notes: The application was registered with read-only common entities, public mar
 ```
 
 Evidence: [Upwork API documentation](https://www.upwork.com/developer/documentation/graphql/api/docs/index.html), [Upwork automation guidance](https://support.upwork.com/hc/en-us/articles/43342677368467-Use-bots-and-other-automation-properly), and [Upwork Legal Center](https://www.upwork.com/legal).
+
+### Fiverr — blocked pending official permission or API
+
+```text
+source_key: fiverr
+reviewed_at: 2026-10-22
+terms_url: https://www.fiverr.com/legal-portal/legal-terms/terms-of-service
+api_docs_url: not identified for marketplace listing ingestion
+allowed_access_method: official API, partner feed or written permission only
+allowed_fields: not finalized
+retention_days: not finalized
+attribution_required: not finalized
+minimum_poll_seconds: not finalized
+auth_required: not finalized
+publication_latency_notes: not finalized
+status: blocked
+reviewer: Freelance Hunter implementation agent
+notes: Fiverr terms prohibit unauthorized bots, robots, spiders, crawlers, scraping and systematic retrieval. No adapter or Playwright/browser agent may be enabled without explicit permission and a documented data-use scope. User-provided authorized exports, screenshots or OCR text may use the existing bounded manual_user_supplied path after review.
+```
+
+Evidence: [Fiverr Terms of Service](https://www.fiverr.com/legal-portal/legal-terms/terms-of-service) and [Fiverr Community Standards](https://help.fiverr.com/hc/en-us/articles/37554441398929-Our-Community-Standards).
 
 ### Jobicy — approved with conservative retention
 

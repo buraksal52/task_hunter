@@ -54,6 +54,7 @@ Case-insensitive alias matching with token boundaries; protect collisions (`Go` 
 | GET | `/api/v1/jobs` | API key | paginated jobs with filters |
 | POST | `/api/v1/imports/manual` | API key | bounded user-supplied normalized import |
 | GET | `/api/v1/sources` | API key | source health |
+| POST | `/api/v1/sources/{source_key}/enable` | API key | enable an approved source only |
 | POST | `/api/v1/collection-runs` | API key | 202 + queued task id |
 
 Pagination must have bounded page size; never return raw source payloads by default. `/hunt` enqueues one run per source or a batch with deduped task keys. `/stats` includes period, source, engagement type, sample size and unknown count. `/sources` includes the latest run duration, counts, status and error code.

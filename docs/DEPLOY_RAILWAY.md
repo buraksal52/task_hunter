@@ -61,6 +61,16 @@ DAILY_REPORT_HOUR=18
 6. Enable `COLLECTION_ENABLED=true` only after the `jobicy` and/or `himalayas` source rows are explicitly enabled and policy-approved.
 7. Enable `INSTANT_ALERTS_ENABLED=true` only after Telegram delivery is verified.
 
+To enable an approved source without opening the database shell, use the authenticated admin endpoint:
+
+```bash
+curl -X POST \
+  -H "X-API-Key: <ADMIN_API_KEY>" \
+  https://<RAILWAY_DOMAIN>/api/v1/sources/jobicy/enable
+```
+
+Repeat with `himalayas` only if that source is also intended to run. The endpoint rejects sources whose policy is not `approved`.
+
 ## Verification after restart
 
 - `/health/live` remains 200.

@@ -71,3 +71,29 @@ def test_jobs_endpoint_filters_and_applies_description_policy(client):
         headers={"X-API-Key": "admin-secret"},
     )
     assert "description" not in restricted_response.json()["items"][0]
+
+
+def test_source_enable_endpoint_requires_approval_and_admin_auth(client):
+    with client.app.state.session_factory() as session:
+        session.add_all(
+            [
+                Source(source_key="jobicy", name="Jobicy", policy_status="approved"),
+                Source(source_key="blocked", name="Blocked", policy_status="blocked"),
+            ]
+        )
+        session.commit()
+
+    assert client.post("/api/v1/sources/jobicy/enable").status_code == 401
+    response = client.post(
+        "/api/v1/sources/jobicy/enable", headers={"X-API-Key": "admin-secret"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "source_key": "jobicy",
+        "enabled": True,
+        "policy_status": "approved",
+    }
+    blocked_response = client.post(
+        "/api/v1/sources/blocked/enable", headers={"X-API-Key": "admin-secret"}
+    )
+    assert blocked_response.status_code == 409
